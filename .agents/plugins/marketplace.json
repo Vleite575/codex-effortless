@@ -1,0 +1,12 @@
+{
+  "name": "codex-effortless",
+  "interface": { "displayName": "Codex Effortless" },
+  "plugins": [
+    {
+      "name": "codex-effortless",
+      "source": { "source": "local", "path": "./" },
+      "policy": { "installation": "AVAILABLE", "authentication": "ON_INSTALL" },
+      "category": "Productivity"
+    }
+  ]
+}

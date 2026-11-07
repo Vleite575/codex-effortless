@@ -1,0 +1,12 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "codex-effortless",
+  "version": "0.3.0",
+  "description": "Escolhe o esforço de raciocínio por tarefa e mostra a decisão.",
+  "extensions": {
+    "com.openai": {
+      "requires_local_executor": true,
+      "hooks": ["./hooks/hooks.json"]
+    }
+  }
+}

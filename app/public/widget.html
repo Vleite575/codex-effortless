@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Codex Effortless</title>
+  <style>
+    :root{font:15px/1.2 ui-sans-serif,system-ui,sans-serif;color:#e8e6ef;background:#171719}*{box-sizing:border-box}body{margin:0;padding:10px;background:#171719}
+    .bar{height:66px;display:flex;align-items:center;gap:24px;padding:0 22px;border:1px solid #34343c;border-radius:18px;background:radial-gradient(circle at 55% 20%,#24242b,#1b1b1f 60%,#171719);box-shadow:0 10px 28px #0005;white-space:nowrap}
+    .brand{display:flex;align-items:center;gap:13px;font-size:21px}.spark{color:#aa9cff;font-size:24px}.muted{color:#8d8b96}.strong{color:#eee;font-weight:650}.metric{display:flex;align-items:center;gap:10px;color:#d2d0d8}.ring{width:30px;height:30px;border:5px solid #45454d;border-top-color:#ddd;border-radius:50%;transform:rotate(20deg)}.spacer{flex:1}.toggle{width:48px;height:28px;border:0;border-radius:20px;padding:3px;background:#9d8cff;cursor:pointer}.toggle i{display:block;width:22px;height:22px;border-radius:50%;background:#fff;margin-left:20px;transition:.18s}.off{background:#484850}.off i{margin-left:0}.button{border:0;background:transparent;color:#bdbac6;font:inherit;cursor:pointer;padding:7px 0}.button:hover{color:#fff}.gear{font-size:24px}.hint{margin:8px 3px 0;color:#8d8b96;font-size:12px}
+    @media(max-width:640px){.bar{gap:12px;padding:0 14px}.brand{font-size:16px}.metric.context{display:none}.button.compact{display:none}}
+  </style>
+</head>
+<body>
+  <section class="bar" aria-label="Codex Effortless status bar">
+    <div class="brand"><span class="spark">✦</span><span class="strong" id="auto">Auto</span><span class="muted">·</span><span id="model">Current</span></div>
+    <div class="metric context"><span class="ring" id="ring"></span><span id="context">20%</span></div><div class="spacer"></div>
+    <button class="toggle" id="toggle" aria-label="Toggle automatic effort"><i></i></button><button class="button" id="autoLabel">Auto</button><button class="button compact" id="compact">Compact</button><button class="button gear" id="settings" aria-label="Settings">⚙</button>
+  </section>
+  <div class="hint" id="hint">Pronto para escolher o esforço da próxima tarefa.</div>
+  <script>
+    let state={effort:'medium',model:'Current',context:20,auto:true,why:'Pronto'};let rpc=0;const pending=new Map();const $=id=>document.getElementById(id);
+    function render(){ $('model').textContent=state.model||'Current';$('context').textContent=(state.context??20)+'%';$('ring').style.transform=`rotate(${20+(state.context??20)*3.6}deg)`;$('auto').textContent=state.auto?'Auto':(state.effort||'Manual');$('toggle').classList.toggle('off',!state.auto);$('hint').textContent=state.why||'Pronto para escolher o esforço da próxima tarefa.' }
+    function notify(method,params){parent.postMessage({jsonrpc:'2.0',method,params},'*')}function request(method,params){return new Promise((resolve,reject)=>{const id=++rpc;pending.set(id,{resolve,reject});parent.postMessage({jsonrpc:'2.0',id,method,params},'*')})}
+    addEventListener('message',e=>{const m=e.data;if(!m||m.jsonrpc!=='2.0')return;if(typeof m.id==='number'){const p=pending.get(m.id);if(!p)return;pending.delete(m.id);m.error?p.reject(m.error):p.resolve(m.result)}if(m.method==='ui/notifications/tool-result'){state={...state,...(m.params?.structuredContent||{})};render()}});
+    const ready=request('ui/initialize',{appInfo:{name:'codex-effortless-widget',version:'0.2.0'},appCapabilities:{},protocolVersion:'2026-01-26'}).then(()=>notify('ui/notifications/initialized',{}));
+    $('toggle').onclick=async()=>{state.auto=!state.auto;render();await ready;try{const r=await request('tools/call',{name:'set_effortless_mode',arguments:{auto:state.auto}});state={...state,...(r?.structuredContent||{})};render()}catch{}};
+    $('compact').onclick=()=>notify('ui/message',{role:'user',content:[{type:'text',text:'Compacte o contexto atual e preserve objetivo, decisões, arquivos alterados e próximos passos.'}]});$('settings').onclick=()=>notify('ui/message',{role:'user',content:[{type:'text',text:'Abra as configurações do Codex Effortless.'}]});$('autoLabel').onclick=()=>notify('ui/message',{role:'user',content:[{type:'text',text:'Mostre qual esforço e qual modelo o Codex Effortless escolheria para a próxima tarefa.'}]});render();
+  </script>
+</body>
+</html>

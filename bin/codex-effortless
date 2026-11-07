@@ -1,0 +1,27 @@
+#!/bin/sh
+set -eu
+
+ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+if [ "$#" -eq 0 ]; then
+  echo "uso: codex-effortless \"seu prompt\"" >&2
+  exit 2
+fi
+
+PROMPT=$*
+if [ "${CODEX_EFFORTLESS_JUDGE:-}" = "codex" ]; then
+  DECISION=$(python3 -c 'import sys; sys.path.insert(0, sys.argv[1]); from judge import choose_with_codex; print("\t".join(choose_with_codex(sys.argv[2], sys.argv[3])))' "$ROOT/src" "$PROMPT" "${CODEX_EFFORTLESS_JUDGE_MODEL:-gpt-5-mini}")
+else
+  DECISION=$(python3 "$ROOT/src/router.py" "$PROMPT")
+fi
+EFFORT=${DECISION%%	*}
+REASON=${DECISION#*	}
+MODEL=${CODEX_EFFORTLESS_MODEL:-${CODEX_MODEL:-}}
+
+printf '\033[36mEffortless\033[0m  esforço: \033[33m%s\033[0m  modelo: %s\n' "$EFFORT" "$MODEL" >&2
+printf '           %s\n' "$REASON" >&2
+
+if [ -n "$MODEL" ]; then
+  exec codex exec -m "$MODEL" -c "model_reasoning_effort=\"$EFFORT\"" "$PROMPT"
+else
+  exec codex exec -c "model_reasoning_effort=\"$EFFORT\"" "$PROMPT"
+fi

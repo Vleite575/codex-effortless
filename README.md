@@ -33,6 +33,10 @@ Depois de instalado, invoque `Codex Effortless` no app para abrir o widget. Ele 
 
 O hook também pede ao agente para renderizar o widget automaticamente em cada mensagem enviada. Como o Codex não permite que um hook chame diretamente um MCP tool, a ativação depende do agente aceitar essa instrução.
 
+## Overlay fiel ao composer
+
+`overlay/run-overlay.sh` compila e mantém uma barra nativa flutuante do macOS acompanhando a janela do Codex, posicionada acima do composer. Ela é o caminho mais fiel ao layout da captura; precisa ficar rodando em um terminal e pode exigir permissão de Acessibilidade para acompanhar outras janelas.
+
 ## Verificação
 
 ```sh

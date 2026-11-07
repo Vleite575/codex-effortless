@@ -81,9 +81,13 @@ final class Delegate: NSObject, NSApplicationDelegate {
         let app = apps.first(where: { $0.isActive }) ?? apps.first
         guard let pid = app?.processIdentifier else { return nil }
         let list = CGWindowListCopyWindowInfo([.optionOnScreenOnly, .excludeDesktopElements], kCGNullWindowID) as? [[String: Any]] ?? []
-        for info in list where (info[kCGWindowOwnerPID as String] as? Int) == Int(pid) && (info[kCGWindowLayer as String] as? Int) == 0 {
-            guard let value = info[kCGWindowBounds as String] as? [String: CGFloat], let rect = CGRect(dictionaryRepresentation: value as CFDictionary) else { continue }
-            return rect
+        for info in list where (info[kCGWindowOwnerPID as String] as? NSNumber)?.intValue == Int(pid) && (info[kCGWindowLayer as String] as? NSNumber)?.intValue == 0 {
+            guard let value = info[kCGWindowBounds as String] as? [String: Any],
+                  let x = (value["X"] as? NSNumber)?.doubleValue,
+                  let y = (value["Y"] as? NSNumber)?.doubleValue,
+                  let width = (value["Width"] as? NSNumber)?.doubleValue,
+                  let height = (value["Height"] as? NSNumber)?.doubleValue else { continue }
+            return CGRect(x: x, y: y, width: width, height: height)
         }
         return nil
     }

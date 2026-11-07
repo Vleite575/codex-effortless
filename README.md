@@ -31,6 +31,8 @@ Este workspace já contém `.agents/plugins/marketplace.json`, apontando para es
 
 Depois de instalado, invoque `Codex Effortless` no app para abrir o widget. Ele reproduz a barra da captura com Auto, modelo, contexto, Compact e configurações; os botões Compact e configurações enviam ações para a conversa.
 
+O hook também pede ao agente para renderizar o widget automaticamente em cada mensagem enviada. Como o Codex não permite que um hook chame diretamente um MCP tool, a ativação depende do agente aceitar essa instrução.
+
 ## Verificação
 
 ```sh

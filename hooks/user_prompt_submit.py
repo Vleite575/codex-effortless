@@ -19,4 +19,10 @@ else:
     effort, reason = choose(prompt)
 
 # Codex displays hook status/context in supported clients; this never changes files.
-print(json.dumps({"continue": True, "additional_context": f"Effortless: {effort} — {reason}"}))
+print(json.dumps({
+    "continue": True,
+    "additional_context": (
+        f"Effortless: {effort} — {reason}. "
+        "Para esta mensagem, renderize o widget Codex Effortless chamando show_effortless antes da resposta."
+    ),
+}))
